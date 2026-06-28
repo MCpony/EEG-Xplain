@@ -1,0 +1,92 @@
+# EEGPT model configuration
+# Hardcoded encoder params (patch_size=64, embed_dim=512, embed_num=4, depth=8, num_heads=8)
+# are not listed here — they are fixed by the pretrained weights.
+#
+# 结构说明：
+#   mode                  : 加载模式，loader 使用
+#   temporal_interpolation: 是否在 preprocess() 中插值，adapter 使用
+#   model                 : 直接传给模型构造函数的参数（含 use_channels_names）
+CONFIGS:
+
+  bcic2a:
+    mode: linear_probe
+    temporal_interpolation: True  # 原始数据 1001 点，需插值到 img_size[1]=1024
+    model:
+      num_classes: 4
+      img_size: [19, 1024]
+      patch_stride: None
+      use_chan_conv: True
+      in_channels: 22
+      use_chan_scale: False
+      use_channels_names: [FP1, FP2, F7, F3, FZ, F4, F8, T7, C3, CZ, C4, T8, P7, P3, PZ, P4, P8, O1, O2]
+
+  bcic2b:
+    mode: linear_probe
+    temporal_interpolation: True  # 原始数据 1001 点，需插值到 img_size[1]=1024
+    model:
+      num_classes: 2
+      img_size: [7, 1024]
+      patch_stride: None
+      use_chan_conv: True
+      in_channels: 3
+      use_chan_scale: False
+      use_channels_names: [C5, C3, C1, CZ, C2, C4, C6]
+
+  kaggle_ern:
+    mode: linear_probe
+    temporal_interpolation: False  # 插值在模型 forward() 内部完成
+    model:
+      num_classes: 2
+      img_size: [19, 512]
+      patch_stride: 32
+      use_chan_conv: True
+      in_channels: 19
+      use_chan_scale: False
+      use_channels_names: [FP1, FP2, F7, F3, FZ, F4, F8, T7, C3, CZ, C4, T8, P7, P3, PZ, P4, P8, O1, O2]
+
+  physio_p300:
+    mode: linear_probe
+    temporal_interpolation: False  # 数据时间点与 img_size 一致，无需插值
+    model:
+      num_classes: 2
+      img_size: [58, 537]
+      patch_stride: 32
+      use_chan_conv: False
+      in_channels: 58
+      use_chan_scale: True
+      use_channels_names: [FP1, FPZ, FP2, AF3, AF4, F7, F5, F3, F1, FZ, F2, F4, F6, F8,
+                           FT7, FC5, FC3, FC1, FCZ, FC2, FC4, FC6, FT8,
+                           T7, C5, C3, C1, CZ, C2, C4, C6, T8,
+                           TP7, CP5, CP3, CP1, CPZ, CP2, CP4, CP6, TP8,
+                           P7, P5, P3, P1, PZ, P2, P4, P6, P8,
+                           PO7, PO3, POZ, PO4, PO8, O1, OZ, O2]
+                           #这里和eegpt与训练中的58个通道顺序和名字都一样
+
+  tuab:
+    mode: full_finetune
+    temporal_interpolation: False  # 插值在模型 forward() 内部完成
+    model:
+      num_classes: 1
+      img_size: [20, 2000]
+      patch_stride: None
+      use_chan_conv: True
+      in_channels: 23
+      chan_conv_kernel: 15
+      head_in_features: 63488   # 31 patches × 4 embed_num × 512 embed_dim
+      head_dropout: 0.8
+      use_channels_names: [FP1, FPZ, FP2, F7, F3, FZ, F4, F8, T7, C3, CZ, C4, T8, P7, P3, PZ, P4, P8, O1, O2]
+
+  tuev:
+    mode: full_finetune
+    task_type: event
+    temporal_interpolation: False  # 插值在模型 forward() 内部完成
+    model:
+      num_classes: 6
+      img_size: [20, 1000]
+      patch_stride: None
+      use_chan_conv: True
+      in_channels: 23
+      chan_conv_kernel: 55
+      head_in_features: 30720   # 15 patches × 4 embed_num × 512 embed_dim
+      head_dropout: 0.8
+      use_channels_names: [FP1, FPZ, FP2, F7, F3, FZ, F4, F8, T7, C3, CZ, C4, T8, P7, P3, PZ, P4, P8, O1, O2]

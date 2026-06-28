@@ -1,0 +1,38 @@
+# BIOT model configuration
+# BIOTClassifier params: emb_size, heads, depth, n_classes, n_channels, n_fft, hop_length
+# n_channels: 模型创建时的通道数（预训练权重决定，用于 channel_tokens Embedding）
+# data_channels: 实际输入数据的通道数（前向传播时只用到这些通道）
+CONFIGS:
+  tuab:
+    n_channels: 18
+    data_channels: 16
+    num_classes: 1
+    emb_size: 256
+    heads: 8
+    depth: 4
+    n_fft: 200
+    hop_length: 100
+    fs: 200
+
+  tuev:
+    task_type: event
+    n_channels: 18
+    data_channels: 16
+    num_classes: 6
+    emb_size: 256
+    heads: 8
+    depth: 4
+    n_fft: 200
+    hop_length: 100
+    fs: 200
+
+  chb:
+    n_channels: 18
+    data_channels: 16
+    num_classes: 1
+    emb_size: 256
+    heads: 8
+    depth: 4
+    n_fft: 200
+    hop_length: 100
+    fs: 200

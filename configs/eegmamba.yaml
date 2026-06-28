@@ -1,0 +1,156 @@
+# EEGMamba model configuration
+# All configurations derived from model_list/eegmamba.py downstream model classes
+# backbone: EEGMamba(in_dim=200, out_dim=200, d_model=200, seq_len=30, n_layer=12)
+#           proj_out replaced with Identity for feature extraction
+# classifier: all_patch_reps (3-layer MLP) used in finetune_main by default
+# is_binary: true → num_classes=1, BCEWithLogitsLoss; false → CrossEntropyLoss
+# NOTE: modma is excluded — n_channels=128 is dataset-specific and rarely finetuned here
+CONFIGS:
+  tuev:
+    n_channels: 16
+    n_patches: 5
+    num_classes: 6
+    classifier_type: all_patch_reps
+    is_binary: false
+    dropout: 0.5
+    fs: 200
+    task_type: event
+    domain: epilepsy
+    epoch_duration: 5.0
+    epoch_structure: "2s背景+1s事件+2s背景"
+    dataset_description: "临床EEG事件标注数据，每个样本为5秒片段（2秒背景+1秒事件+2秒背景），标签为6类EEG事件类型"
+    class_names:
+      0: "SPSW - 尖波/棘慢波"
+      1: "GPED - 广泛性周期性癫痫样放电"
+      2: "PLED - 周期性偏侧癫痫样放电"
+      3: "EYEM - 眼动"
+      4: "ARTF - 伪迹"
+      5: "BCKG - 背景"
+
+  tuab:
+    n_channels: 16
+    n_patches: 10
+    num_classes: 1
+    classifier_type: all_patch_reps
+    is_binary: true
+    dropout: 0.5
+    fs: 200
+    task_type: state
+    domain: clinical
+    epoch_duration: 10.0
+    epoch_structure: "10s连续EEG滑动窗口"
+    dataset_description: "临床EEG记录，每个样本为连续EEG的10秒滑动窗口切片，标签为二分类：正常/异常EEG"
+    class_names:
+      0: "正常EEG"
+      1: "异常EEG"
+
+  mumtaz:
+    n_channels: 19
+    n_patches: 5
+    num_classes: 1
+    classifier_type: all_patch_reps
+    is_binary: true
+    dropout: 0.5
+    fs: 200
+    task_type: state
+    domain: depression
+    epoch_duration: 5.0
+    epoch_structure: "5s连续静息态EEG滑动窗口"
+    dataset_description: "健康对照和重度抑郁症患者的静息态EEG记录，每个样本为5秒滑动窗口切片，标签为二分类：健康对照/重度抑郁症"
+    class_names:
+      0: "HC - 健康对照"
+      1: "MDD - 重度抑郁症"
+
+  faced:
+    n_channels: 32
+    n_patches: 10
+    num_classes: 9
+    classifier_type: all_patch_reps
+    is_binary: false
+    dropout: 0.5
+    fs: 200
+
+  seedv:
+    n_channels: 62
+    n_patches: 1
+    num_classes: 5
+    classifier_type: all_patch_reps
+    is_binary: false
+    dropout: 0.5
+    fs: 200
+
+  seedvig:
+    n_channels: 17
+    n_patches: 8
+    num_classes: 1
+    classifier_type: all_patch_reps
+    is_binary: true
+    dropout: 0.5
+    fs: 200
+
+  physio:
+    n_channels: 64
+    n_patches: 4
+    num_classes: 2
+    classifier_type: all_patch_reps
+    is_binary: false
+    dropout: 0.5
+    fs: 200
+
+  chb:
+    n_channels: 16
+    n_patches: 10
+    num_classes: 1
+    classifier_type: all_patch_reps
+    is_binary: true
+    dropout: 0.5
+    fs: 200
+    task_type: event
+    domain: epilepsy
+
+  shu:
+    n_channels: 32
+    n_patches: 4
+    num_classes: 3
+    classifier_type: all_patch_reps
+    is_binary: false
+    dropout: 0.5
+    fs: 200
+
+  speech:
+    n_channels: 64
+    n_patches: 3
+    num_classes: 4
+    classifier_type: all_patch_reps
+    is_binary: false
+    dropout: 0.5
+    fs: 200
+
+  stress:
+    n_channels: 20
+    n_patches: 5
+    num_classes: 1
+    classifier_type: all_patch_reps
+    is_binary: true
+    dropout: 0.5
+    fs: 200
+
+  bciciv2a:
+    n_channels: 22
+    n_patches: 4
+    num_classes: 4
+    classifier_type: all_patch_reps
+    is_binary: false
+    dropout: 0.5
+    fs: 200
+
+  isruc:
+    # ISRUC uses a different forward: (B, seq_len, C, epoch_size)
+    # backbone → head(Linear) → TransformerEncoder → classifier(Linear)
+    n_channels: 6
+    n_patches: 30
+    num_classes: 5
+    classifier_type: isruc
+    is_binary: false
+    dropout: 0.5
+    fs: 200
