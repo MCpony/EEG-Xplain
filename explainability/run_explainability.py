@@ -815,7 +815,7 @@ def run_explainability(
     **model_kwargs
 ):
     """运行可解释性分析
-
+ 
     Args:
         model_type: 模型类型 (cbramod, eegmamba, etc.)
         config: 配置字典，包含 n_channels, n_patches, num_classes, patch_size

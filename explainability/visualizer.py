@@ -7,7 +7,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from typing import Dict, List, Optional, Tuple, Any
 import os
 
-
+ 
 # ── 通道坐标解析工具（topomap 共用）──────────────────────────────
 
 # 电极别名映射（旧标准 / 大小写变体 → montage 标准名）

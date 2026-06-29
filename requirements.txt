@@ -17,7 +17,7 @@ shap>=0.45.0
 timm>=1.0.0
 transformers>=4.40.0
 typing-extensions>=4.10.0
-
+ 
 # === 需要单独安装（不要直接 pip install -r 一把梭）===
 # 1) torch：按 CUDA 版本从 https://pytorch.org/get-started/locally/ 安装
 #    示例（CUDA 12.1）：

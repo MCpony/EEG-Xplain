@@ -1,6 +1,6 @@
 # CBraMod model configuration
 # All configurations extracted from model_list/cbramod.py
-CONFIGS:
+CONFIGS: 
   tuab:
     n_channels: 16
     n_patches: 10

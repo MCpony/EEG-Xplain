@@ -1,8 +1,4 @@
-"""
-CBraMod 模型适配器 - 简化版
 
-只负责适配，不负责模型创建和权重加载
-"""
 import sys
 import os
 # Add project root to path for importing from parent directory
@@ -13,48 +9,7 @@ import torch
 import torch.nn as nn
 from typing import List, Optional, Callable
 from ..model_adapter import ModelAdapter, ModelAdapterRegistry
-from ..channel_configs import get_channel_names
-
-
-# 默认通道名称配置已迁移到 explainability/channel_configs.py
-# DEFAULT_CHANNEL_NAMES = {
-#     # BCICIV2a - 22 channels (10-20)
-#     'bciciv2a': ['Fz', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'C5', 'C3', 'C1', 'Cz',
-#          'C2', 'C4', 'C6', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'P1', 'Pz', 'P2', 'POz'],
-#     # SEEDVIG - 17 channels
-#     'seedvig': ['FT7', 'FT8', 'T7', 'T8', 'TP7', 'TP8', 'CP1', 'CP2',
-#          'P1', 'PZ', 'P2', 'PO3', 'POZ', 'PO4', 'O1', 'OZ', 'O2'],
-#     # MUMTAZ - 19 channels (10-20)
-#     'mumtaz': ['Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 'T3', 'C3', 'Cz',
-#          'C4', 'T4', 'T5', 'P3', 'Pz', 'P4', 'T6', 'O1', 'O2'],
-#     # PhysioNet - 64 channels (BCI2000)
-#     'physionet': ['Fc5', 'Fc3', 'Fc1', 'Fcz', 'Fc2', 'Fc4', 'Fc6', 'C5', 'C3', 'C1',
-#          'Cz', 'C2', 'C4', 'C6', 'Cp5', 'Cp3', 'Cp1', 'Cpz', 'Cp2', 'Cp4', 'Cp6',
-#          'Fp1', 'Fpz', 'Fp2', 'Af7', 'Af3', 'Afz', 'Af4', 'Af8', 'F7', 'F5', 'F3',
-#          'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'Ft7', 'Ft8', 'T7', 'T8', 'T9', 'T10',
-#          'Tp7', 'Tp8', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8',
-#          'Po7', 'Po3', 'Poz', 'Po4', 'Po8', 'O1', 'Oz', 'O2', 'Iz'],
-#     # STRESS - 20 channels(mental)
-#     'stress': ['Fp1', 'Fp2', 'F3', 'F4', 'F7', 'F8', 'T3',
-#          'T4', 'C3', 'C4', 'T5', 'T6', 'P3', 'P4', 'O1',
-#          'O2', 'Fz', 'Cz', 'Pz', 'A2-A1'],
-#     # Speech - 64 channels (BCI2000)(imaged_speech)
-#     'speech': ['Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 'FC5', 'FC1', 'FC2',
-#         'FC6', 'T7', 'C3', 'Cz', 'C4', 'T8', 'TP9', 'CP5', 'CP1', 'CP2', 'CP6',
-#         'TP10', 'P7', 'P3', 'Pz', 'P4', 'P8', 'PO9', 'O1', 'Oz', 'O2', 'PO10',
-#         'AF7', 'AF3', 'AF4', 'AF8', 'F5', 'F1', 'F2', 'F6', 'FT9', 'FT7', 'FC3',
-#         'FC4', 'FT8', 'FT10', 'C5', 'C1', 'C2', 'C6', 'TP7', 'CP3', 'CPz', 'CP4',
-#         'TP8', 'P5', 'P1', 'P2', 'P6', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'],
-#     # SHU - 32 channels (10-20 Extended)
-#     'shu': ['Fp1', 'Fp2', 'AF3', 'AF4', 'F7', 'F3', 'Fz', 'F4', 'F8', 'FC5', 'FC1',
-#             'FC2', 'FC6', 'T7', 'C3', 'Cz', 'C4', 'T8', 'CP5', 'CP1', 'CP2', 'CP6',
-#             'P7', 'P3', 'Pz', 'P4', 'P8', 'PO3', 'PO4', 'O1', 'Oz', 'O2'],
-#     # FACED - 32 channels (10-20 Extended)
-#     'faced': ['FP1', 'FPZ', 'FP2', 'AF3', 'AF4', 'F7', 'F5', 'F3', 'F1', 'FZ',
-#               'F2', 'F4', 'F6', 'F8', 'FT7', 'FC5', 'FC3', 'FC1', 'FCZ', 'FC2',
-#               'FC4', 'FC6', 'FT8', 'T7', 'C5', 'C3', 'C1', 'CZ', 'C2', 'C4',
-#               'C6', 'T8'],
-# }
+from ..channel_configs import get_channel_name
 
 
 @ModelAdapterRegistry.register('cbramod')
@@ -64,28 +19,7 @@ class CBraModAdapter(ModelAdapter):
 
     用于将 CBraMod 模型适配到可解释性框架
 
-    Example:
-        # 1. 用户自己创建和加载模型
-        from model_list.cbramod_unified import create_cbramod_model
-        model = create_cbramod_model(
-            task='tuab',
-            foundation_path='foundation.pth',
-            checkpoint_path='finetuned.pth',
-            device='cuda'
-        )
-
-        # 2. 用适配器包装
-        adapter = CBraModAdapter(
-            model,
-            n_channels=16,
-            n_patches=10,
-            channel_names=['Fp1', 'Fp2', ...]  # 可选
-        )
-
-        # 3. 使用可解释性方法
-        method = ExplainabilityRegistry.create('gradcam', adapter)
-        result = method.explain(input_tensor)
-    """
+    """ 
 
     model_name = "cbramod"
     supported_methods = ['gradcam', 'ig', 'gradient_shap', 'saliency',

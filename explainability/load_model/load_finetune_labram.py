@@ -2,7 +2,7 @@
 # LaBraM Finetuned Model Loader
 # Simplified loader for loading finetuned LaBraM models
 # --------------------------------------------------------
-
+ 
 import torch
 import torch.nn as nn
 import pickle
@@ -42,12 +42,6 @@ class LaBraMLoader:
 
         Returns:
             Loaded model ready for inference
-
-        Example:
-            >>> model = LaBraMLoader.load(
-            ...     './checkpoints/tuab_best.pth',
-            ...     num_classes=1, drop_path_rate=0.1
-            ... )
         """
         print(f"Creating {model_name} with config: {config}")
 
@@ -125,31 +119,4 @@ class LaBraMLoader:
 
 
 if __name__ == '__main__':
-    print("""
-LaBraM Loader Usage:
-
-# Load model with config from YAML
-import yaml
-with open('configs/labram.yaml') as f:
-    configs = yaml.safe_load(f)['CONFIGS']
-
-model = LaBraMLoader.load(
-    './checkpoints/tuab_best.pth',
-    model_name='labram_base_patch200_200',
-    **configs['tuab']
-)
-
-# Or load with explicit parameters
-model = LaBraMLoader.load(
-    './checkpoints/tuab_best.pth',
-    model_name='labram_base_patch200_200',
-    num_classes=1,
-    drop_rate=0.0,
-    drop_path_rate=0.1,
-    attn_drop_rate=0.0,
-    use_rel_pos_bias=False,
-    use_abs_pos_emb=True,
-    qkv_bias=False,
-    use_mean_pooling=True
-)
-    """)
+    print(""" """)

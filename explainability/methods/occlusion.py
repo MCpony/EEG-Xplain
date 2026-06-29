@@ -156,3 +156,4 @@ class OcclusionMethod(ExplainabilityMethod):
             'stride': (1, 1, 25),
             'baseline_value': 0.0,
         }
+ 

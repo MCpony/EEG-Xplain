@@ -14,7 +14,7 @@ class SHAPMethod(ExplainabilityMethod):
 
     基于Shapley值的归因方法
     """
-
+ 
     name = "shap"
     description = "SHAP - 基于博弈论Shapley值的归因，提供一致的特征重要性"
 
@@ -77,12 +77,6 @@ class SHAPMethod(ExplainabilityMethod):
     def _explain_shap(self, input_tensor: torch.Tensor, background: torch.Tensor,
                       target: Optional[int]) -> Dict[str, np.ndarray]:
         """使用shap库计算SHAP值（patch-level KernelSHAP）。
-
-        以 (C, N_patches) 为特征空间而非逐元素展开，原因：
-        1. 避免 O(C × N × P) 维度导致的 OOM
-        2. patch-level Shapley 值语义更清晰（整段时间窗的贡献）
-        3. 与其他方法输出的 (C, N_patches) 粒度对齐
-        每个超特征被 mask=0 时用背景均值替换整个 patch 向量。
         """
         import shap
 

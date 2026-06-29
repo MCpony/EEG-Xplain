@@ -19,7 +19,7 @@ CONFIGS:
       in_channels: 22
       use_chan_scale: False
       use_channels_names: [FP1, FP2, F7, F3, FZ, F4, F8, T7, C3, CZ, C4, T8, P7, P3, PZ, P4, P8, O1, O2]
-
+ 
   bcic2b:
     mode: linear_probe
     temporal_interpolation: True  # 原始数据 1001 点，需插值到 img_size[1]=1024

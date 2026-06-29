@@ -766,7 +766,7 @@ def grand_average_patch_band_correlation(
 
     print(f"  Grand corr computed. Pos top-3: "
           f"{[channel_names[i] for i in pos_top_indices[:3]]}")
-
+ 
     # ---- 诊断：打印每个样本的 ρ，用于判断跨样本方差来源 ----
     print(f"\n[Diagnosis] Per-sample Spearman ρ for pos/neg top channels:")
     for ch_idx in list(pos_top_indices[:3]) + list(neg_top_indices[:3]):

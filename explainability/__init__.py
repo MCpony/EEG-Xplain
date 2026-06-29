@@ -2,24 +2,8 @@
 EEG Explainability Framework
 可扩展的EEG模型可解释性分析框架
 
-使用方法：
-    from explainability import ExplainabilityRegistry, EEGVisualizer
-    from explainability.adapters import CBraModAdapter
-
-    # 1. 创建模型适配器
-    adapter = CBraModAdapter(model, n_channels=20, n_patches=5)
-
-    # 2. 创建可解释性方法
-    method = ExplainabilityRegistry.create('gradcam', adapter)
-
-    # 3. 计算归因
-    result = method.explain(input_tensor)
-
-    # 4. 可视化
-    visualizer = EEGVisualizer()
-    visualizer.plot_heatmap(result['combined'], channel_names)
 """
-
+ 
 from .base import (
     ExplainabilityMethod,
     ExplainabilityRegistry,
@@ -57,8 +41,6 @@ __all__ = [
     'SHAPMethod',
     'LIMEMethod',
     'IntegratedGradientsMethod',
-    'DeepLiftMethod',
-    'GradInputMethod',
     'OcclusionMethod',
     # 适配器
     'CBraModAdapter',

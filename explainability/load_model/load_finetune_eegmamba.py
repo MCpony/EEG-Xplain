@@ -12,7 +12,7 @@ from collections import OrderedDict
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
-
+ 
 from model_list.eegmamba import (
     model_for_tuev,
     model_for_tuab,
@@ -62,26 +62,6 @@ def _get_model_class(dataset_name: str):
 class EEGMambaLoader:
     """
     EEGMamba finetuned model loader.
-
-    The checkpoint is a raw state_dict (saved via torch.save(model.state_dict(), path)).
-    Pass a param-like object or a SimpleNamespace with the fields the target Model.__init__ expects.
-
-    Example
-    -------
-    >>> from types import SimpleNamespace
-    >>> param = SimpleNamespace(
-    ...     use_pretrained_weights=False,
-    ...     foundation_dir=None,
-    ...     cuda=0,
-    ...     classifier='avgpooling_patch_reps',
-    ...     num_of_classes=6,
-    ...     dropout=0.5,
-    ... )
-    >>> model = EEGMambaLoader.load(
-    ...     checkpoint_path='./checkpoints/tuev_best.pth',
-    ...     dataset_name='tuev',
-    ...     param=param,
-    ... )
     """
 
     @classmethod

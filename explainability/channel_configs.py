@@ -2,74 +2,6 @@
 EEG 通道名称配置按模型分层索引，每个模型只检索自己的任务通道配置
 """
 
-# ============================================================
-# 通用通道配置（cbramod / labram / eegmamba 共用）
-# ============================================================
-# _COMMON = {
-#     # TUAB - 16 channels (TCP Bipolar)
-#     'tuab': ['FP1-F7', 'F7-T3', 'T3-T5', 'T5-O1', 'FP1-F3', 'F3-C3', 'C3-P3', 'P3-O1',
-#              'FP2-F4', 'F4-C4', 'C4-P4', 'P4-O2', 'FP2-F8', 'F8-T4', 'T4-T6', 'T6-O2'],
-
-#     # TUEV - 16 channels (TCP Bipolar)
-#     'tuev': ['FP1-F7', 'F7-T3', 'T3-T5', 'T5-O1', 'FP1-F3', 'F3-C3', 'C3-P3', 'P3-O1',
-#              'FP2-F4', 'F4-C4', 'C4-P4', 'P4-O2', 'FP2-F8', 'F8-T4', 'T4-T6', 'T6-O2'],
-
-#     # CHB - 16 channels (TCP Bipolar)
-#     'chb': ['FP1-F7', 'F7-T3', 'T3-T5', 'T5-O1', 'FP1-F3', 'F3-C3', 'C3-P3', 'P3-O1',
-#             'FP2-F4', 'F4-C4', 'C4-P4', 'P4-O2', 'FP2-F8', 'F8-T4', 'T4-T6', 'T6-O2'],
-
-#     # BCICIV2a - 22 channels (10-20)
-#     'bciciv2a': ['Fz', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'C5', 'C3', 'C1', 'Cz',
-#                  'C2', 'C4', 'C6', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'P1', 'Pz', 'P2', 'POz'],
-
-#     # MUMTAZ - 19 channels (10-20)
-#     'mumtaz': ['Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 'T3', 'C3', 'Cz',
-#                'C4', 'T4', 'T5', 'P3', 'Pz', 'P4', 'T6', 'O1', 'O2'],
-
-#     # PhysioNet - 64 channels (BCI2000)
-#     'physio': ['Fc5', 'Fc3', 'Fc1', 'Fcz', 'Fc2', 'Fc4', 'Fc6', 'C5', 'C3', 'C1',
-#                'Cz', 'C2', 'C4', 'C6', 'Cp5', 'Cp3', 'Cp1', 'Cpz', 'Cp2', 'Cp4', 'Cp6',
-#                'Fp1', 'Fpz', 'Fp2', 'Af7', 'Af3', 'Afz', 'Af4', 'Af8', 'F7', 'F5', 'F3',
-#                'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'Ft7', 'Ft8', 'T7', 'T8', 'T9', 'T10',
-#                'Tp7', 'Tp8', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8',
-#                'Po7', 'Po3', 'Poz', 'Po4', 'Po8', 'O1', 'Oz', 'O2', 'Iz'],
-
-#     # STRESS - 20 channels
-#     'stress': ['Fp1', 'Fp2', 'F3', 'F4', 'F7', 'F8', 'T3',
-#                'T4', 'C3', 'C4', 'T5', 'T6', 'P3', 'P4', 'O1',
-#                'O2', 'Fz', 'Cz', 'Pz', 'A2-A1'],
-
-#     # Speech - 64 channels
-#     'speech': ['Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 'FC5', 'FC1', 'FC2',
-#                'FC6', 'T7', 'C3', 'Cz', 'C4', 'T8', 'TP9', 'CP5', 'CP1', 'CP2', 'CP6',
-#                'TP10', 'P7', 'P3', 'Pz', 'P4', 'P8', 'PO9', 'O1', 'Oz', 'O2', 'PO10',
-#                'AF7', 'AF3', 'AF4', 'AF8', 'F5', 'F1', 'F2', 'F6', 'FT9', 'FT7', 'FC3',
-#                'FC4', 'FT8', 'FT10', 'C5', 'C1', 'C2', 'C6', 'TP7', 'CP3', 'CPz', 'CP4',
-#                'TP8', 'P5', 'P1', 'P2', 'P6', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'],
-
-#     # SHU - 32 channels (10-20 Extended)
-#     'shu': ['Fp1', 'Fp2', 'AF3', 'AF4', 'F7', 'F5', 'F3', 'F1', 'Fz',
-#             'F2', 'F4', 'F6', 'F8', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2',
-#             'FC4', 'FC6', 'FT8', 'T7', 'C5', 'C3', 'C1', 'Cz', 'C2', 'C4',
-#             'C6', 'T8'],
-
-#     # FACED - 32 channels (10-20 Extended)
-#     'faced': ['FP1', 'FPZ', 'FP2', 'AF3', 'AF4', 'F7', 'F5', 'F3', 'F1', 'Fz',
-#               'F2', 'F4', 'F6', 'F8', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2',
-#               'FC4', 'FC6', 'FT8', 'T7', 'C5', 'C3', 'C1', 'CZ', 'C2', 'C4',
-#               'C6', 'T8'],
-
-#     # SEEDV - 62 channels (NeuroScan)
-#     'seedv': ['Fp1', 'Fpz', 'Fp2', 'AF3', 'AF4', 'F7', 'F5', 'F3', 'F1', 'Fz',
-#               'F2', 'F4', 'F6', 'F8', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2',
-#               'FC4', 'FC6', 'FT8', 'T7', 'C5', 'C3', 'C1', 'Cz', 'C2', 'C4',
-#               'C6', 'T8', 'TP7', 'CP5', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'CP6',
-#               'TP8', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8',
-#               'PO7', 'PO5', 'PO3', 'POz', 'PO4', 'PO6', 'PO8', 'CB1', 'O1', 'Oz', 'O2', 'CB2'],
-
-#     # SEEDVIG - 17 channels
-
-
 _CBRAMOD = {
 
     'mumtaz': ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
@@ -216,3 +148,4 @@ def get_channel_names(model_type: str, task: str, n_channels: int = None):
         return [f'Ch{i+1}' for i in range(n_channels)]
 
     return []
+ 

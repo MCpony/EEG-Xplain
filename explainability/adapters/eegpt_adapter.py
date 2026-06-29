@@ -8,7 +8,7 @@ import numpy as np
 from typing import List, Optional, Dict, Any, Tuple, Callable
 from ..model_adapter import ModelAdapter, ModelAdapterRegistry
 from ..channel_configs import get_channel_names
-
+ 
 # EEGPT standard channel dictionary (mirrors CHANNEL_DICT in EEGPT source)
 EEGPT_CHANNEL_DICT = {k.upper(): v for v, k in enumerate(
     ['FP1', 'FPZ', 'FP2',
@@ -38,28 +38,6 @@ class EEGPTAdapter(ModelAdapter):
     - 每个 patch 内部：(N_channels + embed_num) tokens 经 Attention
     - embed_dim=512, embed_num=4, patch_size=64
 
-    Example:
-        # 1. 加载模型
-        model = EEGPTClassifier(
-            num_classes=6,
-            in_channels=23,
-            img_size=[20, 1000],
-            use_chan_conv=True,
-            use_channels_names=[...],
-        )
-        checkpoint = torch.load('checkpoint-best.pth')
-        model.load_state_dict(checkpoint['model'], strict=False)
-
-        # 2. 用适配器包装
-        adapter = EEGPTAdapter(
-            model,
-            config={'in_channels': 23, 'img_size': [20, 1000], 'mode': 'full_finetune'},
-            task='tuev'
-        )
-
-        # 3. 使用可解释性方法
-        method = ExplainabilityRegistry.create('gradcam', adapter)
-        result = method.explain(input_tensor)
     """
 
     model_name = "eegpt"
@@ -135,7 +113,7 @@ class EEGPTAdapter(ModelAdapter):
         else:
             self._channels_index = None
 
-        # 是否在预处理阶段做时间插值（bcic2a/2b 需要，其他任务插值在模型内部或无需）
+        # 是否在预处理阶段做时间插值
         self._temporal_interpolation = config.get('temporal_interpolation', False)
 
         # 查找目标层
@@ -143,7 +121,6 @@ class EEGPTAdapter(ModelAdapter):
 
     def _find_target_layer(self) -> nn.Module:
         """查找用于 GradCAM 的目标层
-
         linear_probe 模式下 forward() 会临时给 target_encoder 开梯度，
         所以可以直接用 target_encoder 最后一个 block 作为目标层，
         能得到完整的通道×时间热力图。
@@ -211,9 +188,6 @@ class EEGPTAdapter(ModelAdapter):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """前向传播（直接调用模型，chan_ids 已在模型内部存储）"""
-        # linear_probe 模式下 target_encoder 被强制 eval()，参数默认无梯度。
-        # 临时开启梯度，让 GradCAM 能从 encoder 内部的目标层拿到非零梯度。
-        # eval 模式保留（BN/Dropout 行为不变），不影响推理结果。
         if self._mode == 'linear_probe' and hasattr(self.model, 'target_encoder'):
             for p in self.model.target_encoder.parameters():
                 p.requires_grad_(True)
@@ -232,9 +206,6 @@ class EEGPTAdapter(ModelAdapter):
     def get_reshape_transform(self) -> Optional[Callable]:
         """
         linear_probe 模式目标层为 linear_probe1，输出 (B, N_patches, lp1_out)，
-        直接映射到 (B, features, N_patches)，GradCAM 可处理。
-        full_finetune 模式目标层为 target_encoder.blocks[-1]，
-        输出 (B*N_patches, C+embed_num, D)，需要 reshape。
         """
         # target_encoder.blocks[-1] 输出 (B*N_patches, C+embed_num, D)
         # linear_probe 和 full_finetune 都用同一个 reshape

@@ -6,7 +6,7 @@ import torch.nn as nn
 import numpy as np
 from typing import Dict, Any, Optional, List, Callable
 from ..base import ExplainabilityMethod, ExplainabilityRegistry
-
+ 
 
 @ExplainabilityRegistry.register('gradcam')
 class GradCAMMethod(ExplainabilityMethod):
@@ -152,11 +152,7 @@ class GradCAMMethod(ExplainabilityMethod):
         print(f"[DEBUG] activations range: [{activations.min().item():.4f}, {activations.max().item():.4f}]")
         print(f"[DEBUG] gradients range: [{gradients.min().item():.4f}, {gradients.max().item():.4f}]")
 
-        # 经过reshape_transform后，张量形状为 (batch, features, channels, patches)
-        # 即 (batch, 200, 20, 5)
-        # 每个 (channel, patch) 位置有 200 维特征向量
-        # 目标是生成 (channels, patches) 的热力图
-
+       
         if activations.dim() == 4:
             # (batch, features, channels, patches) 格式
             # 在空间维度 (channels, patches) 上求平均，得到每个特征的全局重要性权重

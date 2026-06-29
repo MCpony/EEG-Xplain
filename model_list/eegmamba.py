@@ -14,7 +14,7 @@ class MambaConfig:
     residual_in_fp32: bool = True
     fused_add_norm: bool = True
 
-
+ 
 # Copyright (c) 2023, Albert Gu, Tri Dao.
 
 import math

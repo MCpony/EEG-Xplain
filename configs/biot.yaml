@@ -1,7 +1,7 @@
 # BIOT model configuration
 # BIOTClassifier params: emb_size, heads, depth, n_classes, n_channels, n_fft, hop_length
-# n_channels: 模型创建时的通道数（预训练权重决定，用于 channel_tokens Embedding）
-# data_channels: 实际输入数据的通道数（前向传播时只用到这些通道）
+# n_channels: Number of channels at model creation (determined by pre-training weights; used for channel_tokens embedding)
+# data_channels: Number of channels in the actual input data (only these channels are used during forward pass)
 CONFIGS:
   tuab:
     n_channels: 18

@@ -219,3 +219,4 @@ class LIMEMethod(ExplainabilityMethod):
             'kernel_width': 1.0,
             'unit': 'channel_patch',
         }
+ 

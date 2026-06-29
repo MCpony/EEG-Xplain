@@ -768,4 +768,4 @@ def _save_single_deletion_report(
     lines += ["", "=" * 55]
     with open(path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(lines))
-    print(f"[Saved] {path}")
+    print(f"[Saved] {path}") 

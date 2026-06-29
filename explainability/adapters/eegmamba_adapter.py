@@ -8,7 +8,7 @@ import numpy as np
 from typing import List, Optional, Dict, Any, Tuple, Callable
 from ..model_adapter import ModelAdapter, ModelAdapterRegistry
 from ..channel_configs import get_channel_names
-
+ 
 
 @ModelAdapterRegistry.register('eegmamba')
 class EEGMambaAdapter(ModelAdapter):
@@ -21,28 +21,6 @@ class EEGMambaAdapter(ModelAdapter):
     - classifier: 各 task 的分类头
     - 输入: (B, C, L, P)，C=通道数, L=patch数, P=patch_size(200)
     - backbone 输出: (B, C, L, 200)
-
-    GradCAM 目标层选 backbone.encoder.layers[-1]（最后一个 Mamba2 block），
-    其输出形状为 (B, C*L, 200)，需 reshape 为 (B, 200, C, L) 供 GradCAM 使用。
-
-    Example:
-        # 1. 加载模型
-        from explainability.load_model.load_finetune_eegmamba import EEGMambaLoader
-        model = EEGMambaLoader.load(
-            checkpoint_path='./checkpoints/tuev_best.pth',
-            dataset_name='tuev',
-            device='cuda',
-        )
-
-        # 2. 用适配器包装
-        import yaml
-        with open('configs/eegmamba.yaml') as f:
-            config = yaml.safe_load(f)['CONFIGS']['tuev']
-        adapter = EEGMambaAdapter(model, config=config, task='tuev')
-
-        # 3. 使用可解释性方法
-        method = ExplainabilityRegistry.create('ig', adapter)
-        result = method.explain(input_tensor)
     """
 
     model_name = "eegmamba"
@@ -88,19 +66,6 @@ class EEGMambaAdapter(ModelAdapter):
     def _find_target_layer(self) -> nn.Module:
         """
         查找 GradCAM 目标层：backbone.encoder.norm_f（RMSNorm）。
-
-        选择 norm_f 而非 encoder.layers[-1] 的原因：
-        - Mamba2 Block.forward() 返回 (hidden_states, residual) 两个值，
-          hook 只能捕获第一个，residual 丢失导致梯度错误。
-        - fused_add_norm=True 时使用 Triton fused kernel，标准 hook 无法触发。
-        - norm_f 是 MixerModel.forward() 的最终单输出层，hook 稳定可靠。
-
-        norm_f 输出形状 (B, C*L, 200)，经 reshape_transform 变为 (B, 200, C, L)
-        供 GradCAM 计算 patch 级热力图，最终结果粒度为 (C, L)。
-
-        注意：深层特征经过多次 flip 后 token 位置与输入 patch 的对应关系已打乱，
-        GradCAM 热力图反映的是语义重要性而非精确的时空位置。IG 等输入归因方法
-        不受此影响，可获得采样点级 (B, C, L, 200) 的精细归因结果。
         """
         if hasattr(self.model, 'backbone'):
             backbone = self.model.backbone
@@ -133,7 +98,6 @@ class EEGMambaAdapter(ModelAdapter):
     def get_reshape_transform(self) -> Optional[Callable]:
         """
         GradCAM reshape 变换。
-
         norm_f 输出为 (B, C*L, d_model)，
         reshape 为 (B, d_model, C, L) 供 GradCAM 计算空间热力图。
         GradCAM 对 d_model 维做 global average pooling，最终热力图为 (B, C, L)。
@@ -154,7 +118,6 @@ class EEGMambaAdapter(ModelAdapter):
     def preprocess(self, x: np.ndarray) -> torch.Tensor:
         """
         预处理输入数据。
-
         Args:
             x: numpy array，形状 (C, L, P) 或 (B, C, L, P)
                C=通道数, L=patch数, P=patch_size(200)

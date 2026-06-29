@@ -167,3 +167,4 @@ class IntegratedGradientsMethod(ExplainabilityMethod):
             'baseline_type': 'zero',
         }
 
+ 

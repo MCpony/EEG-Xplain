@@ -112,7 +112,7 @@ def _class_permute_band(signal_1d: np.ndarray, fs: float,
     residual = signal_1d - original_band
     return (residual + donor_band).astype(signal_1d.dtype)
 
-
+ 
 def _gaussian_replace_band(signal_1d: np.ndarray, fs: float,
                            f_lo: float, f_hi: float, rng=None) -> np.ndarray:
     """用 1/f 频谱形状的噪声替换目标频段，保持 EEG 自然的功率衰减特性。"""

@@ -18,21 +18,6 @@ class BIOTAdapter(ModelAdapter):
 
     用于将 BIOT 模型适配到可解释性框架
 
-    Example:
-        # 1. 用户自己创建和加载模型
-        from explainability.load_model.load_finetune_biot import BIOTLoader
-        model = BIOTLoader.load(
-            checkpoint_path='finetuned.pth',
-            device='cuda',
-            **configs['tuab']
-        )
-
-        # 2. 用适配器包装
-        adapter = BIOTAdapter(model, config=configs['tuab'], task='tuab')
-
-        # 3. 使用可解释性方法
-        method = ExplainabilityRegistry.create('gradcam', adapter)
-        result = method.explain(input_tensor)
     """
 
     model_name = "biot"
@@ -204,11 +189,6 @@ class BIOTAdapter(ModelAdapter):
 
     def get_reshape_transform(self) -> Optional[Callable]:
         """GradCAM reshape 变换
-
-        Transformer 输出 (B, n_channels * ts, emb_dim)
-        需要 reshape 为 (B, emb_dim, n_channels, ts) 供 GradCAM 使用
-
-        n_channels 从实际输入动态获取（模型支持 <= n_channels 的任意通道数）
         """
         adapter = self
 
@@ -222,3 +202,4 @@ class BIOTAdapter(ModelAdapter):
             return tensor
 
         return reshape_fn
+  

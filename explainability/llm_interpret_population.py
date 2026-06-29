@@ -299,7 +299,7 @@ def interpret_population(
         if not images:
             print("  [Warning] No images found, falling back to json mode.")
             mode = "json"
-
+ 
     if mode == "picture":
         print(f"  Sending {len(images)} images + context to {llm}...")
         if llm == "claude":

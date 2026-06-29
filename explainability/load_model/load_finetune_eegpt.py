@@ -2,7 +2,7 @@ from collections import OrderedDict
 import torch
 from model_list.eegpt import EEGPTLinearProbeClassifier, EEGPTFullFinetuneClassifier
 
-
+ 
 class EEGPTLoader:
 
     @classmethod

@@ -90,35 +90,11 @@ class BIOTLoader:
                 key = key[7:]
             if key.startswith('model.'):
                 key = key[6:]
-
+ 
             new_dict[key] = value
 
         return new_dict
 
 
 if __name__ == '__main__':
-    print("""
-BIOT Loader Usage:
-
-# Load model with config from YAML
-import yaml
-with open('configs/biot.yaml') as f:
-    configs = yaml.safe_load(f)['CONFIGS']
-
-model = BIOTLoader.load(
-    './checkpoints/tuab_best.pth',
-    **configs['tuab']
-)
-
-# Or load with explicit parameters
-model = BIOTLoader.load(
-    './checkpoints/tuab_best.pth',
-    n_channels=16,
-    num_classes=1,
-    emb_size=256,
-    heads=8,
-    depth=4,
-    n_fft=200,
-    hop_length=100
-)
-    """)
+    print(""" """)

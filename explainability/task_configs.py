@@ -107,3 +107,4 @@ def list_tasks() -> Dict[str, str]:
 def register_task(name: str, config: TaskConfig):
     """注册新任务配置"""
     TASK_CONFIGS[name.lower()] = config
+ 

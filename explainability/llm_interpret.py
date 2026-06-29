@@ -331,7 +331,7 @@ def _build_user_message_text(ctx: Dict[str, Any]) -> str:
     lines.append("```")
 
     return "\n".join(lines)
-
+ 
 
 def _query_claude_vision(
     system: str, text: str, images: List[Dict[str, str]],

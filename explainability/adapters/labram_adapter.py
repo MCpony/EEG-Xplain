@@ -8,7 +8,7 @@ import numpy as np
 from typing import List, Optional, Dict, Any, Tuple, Callable
 from ..model_adapter import ModelAdapter, ModelAdapterRegistry
 from ..channel_configs import get_channel_names
-
+ 
 #channel_names = ['FP1', 'FP2', 'C3', 'C4', 'P7', 'P8', 'O1', 'O2', 'F7', 'F8', 'F3', 'F4', 'T7', 'T8', 'P3', 'P4']
 standard_1020 = [
     'FP1', 'FPZ', 'FP2', 
@@ -30,32 +30,7 @@ standard_1020 = [
 
 @ModelAdapterRegistry.register('labram')
 class LaBraMAdapter(ModelAdapter):
-    """
-    LaBraM 模型适配器
 
-    用于将 LaBraM (Large Brain Model) 适配到可解释性框架
-
-    Example:
-        # 1. 用户自己创建和加载模型
-        from load_finetune_labram import load_labram_model
-        model = load_labram_model(
-            task='faced',
-            checkpoint_path='finetuned.pth',
-            device='cuda'
-        )
-
-        # 2. 用适配器包装
-        adapter = LaBraMAdapter(
-            model,
-            n_channels=32,
-            n_patches=5,
-            task='faced'
-        )
-
-        # 3. 使用可解释性方法
-        method = ExplainabilityRegistry.create('gradcam', adapter)
-        result = method.explain(input_tensor)
-    """
 
     model_name = "labram"
     supported_methods = ['gradcam', 'ig', 'gradient_shap', 'saliency',
@@ -106,16 +81,6 @@ class LaBraMAdapter(ModelAdapter):
 
     def _find_target_layer(self) -> nn.Module:
         """查找目标层用于GradCAM
-
-        该函数用于查找 LaBraM 模型中用于 GradCAM 计算的目标层。
-        具体实现如下：
-
-        1. 首先判断模型是否存在 `blocks` 属性，并且 `blocks` 列表长度大于 0。
-        如果条件成立，则返回最后一个 `blocks` 模块。
-        2. 如果条件不成立，则遍历模型中的所有模块，并且找到名称中包含 "block" 的模块，
-        并将其作为目标层返回。
-        3. 如果没有找到满足条件的模块，则返回模型本身。
-
         LaBraM 结构：blocks.0, blocks.1, ..., blocks.11, fc_norm, head
         选择最后一个 Transformer block
         """

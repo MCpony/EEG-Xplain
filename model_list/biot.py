@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import numpy as np
 from linear_attention_transformer import LinearAttentionTransformer
 
-
+ 
 class PatchFrequencyEmbedding(nn.Module):
     def __init__(self, emb_size=256, n_freq=101):
         super().__init__()
