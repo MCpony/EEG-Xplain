@@ -1,57 +1,57 @@
 # EEG-Xplain
 
-EEG 基础模型的可解释性分析框架。支持多种 EEG 基础模型 / 多种归因方法 / 单样本与群体级分析 / LLM 自动解读。
+An explainability analysis framework for EEG foundation models. Supports multiple EEG models, attribution methods, single-sample and population-level analysis, and LLM-based interpretation.
 
 ---
 
-## 主要特性
+## Features
 
-- **多模型支持**：CBraMod、LaBraM、EEGMamba、EEGPT、BIOT
-- **多归因方法**：GradCAM、Integrated Gradients、Gradient SHAP、SHAP、LIME、Occlusion
-- **多维度分析**
-  - 单样本归因（通道地形图、波形归因）
-  - 群体级归因（跨样本平均 + 统计检验）
-  - 频段归因（Delta/Theta/Alpha/Beta/Gamma 五频段分别贡献）
-  - Patch 归因 vs 频段能量相关性（Spearman ρ）
-  - 忠实度评估（AOPC）
-- **LLM 自动解读**：调 Claude / OpenAI / DeepSeek 生成可读报告
+- **Multi-model support**: CBraMod, LaBraM, EEGMamba, EEGPT, BIOT
+- **Multi-method attribution**: GradCAM, Integrated Gradients, Gradient SHAP, SHAP, LIME, Occlusion
+- **Multi-dimensional analysis**
+  - Single-sample attribution (channel topomap, waveform attribution)
+  - Population-level attribution (cross-sample average + statistical testing)
+  - Spectral band attribution (Delta / Theta / Alpha / Beta / Gamma)
+  - Patch attribution vs. band energy correlation (Spearman ρ)
+  - Faithfulness evaluation (AOPC)
+- **LLM interpretation**: Auto-generate readable reports via Claude / OpenAI / DeepSeek
 
 ---
 
-## 项目结构
+## Project Structure
 
 ```
 EEG-Xplain/
-├── configs/                  # 模型 YAML 配置
-├── model_list/               # 模型定义
-├── pretrained-models/        # 预训练权重
-├── data/                     # 数据）
+├── configs/                  # Model YAML configs
+├── model_list/               # Model definitions
+├── pretrained-models/        # Pretrained weights (not tracked by git)
+├── data/                     # Data (not tracked by git)
 ├── explainability/
-│   ├── run_explainability.py        # 单样本分析主入口
-│   ├── run_population_analysis.py   # 群体分析主入口
-│   ├── llm_interpret_population.py  # 群体 LLM 解读
-│   ├── methods/                     # 归因方法实现
-│   ├── adapters/                    # 模型适配器
-│   ├── load_model/                  # 权重加载
-│   ├── spectral_attribution.py      # Patch-频段相关性分析
-│   ├── spectral_band_attribution.py # 频段归因
-│   ├── faithfulness.py              # AOPC 忠实度评估
-│   └── visualizer.py                # 可视化工具
+│   ├── run_explainability.py        # Single-sample analysis entry point
+│   ├── run_population_analysis.py   # Population analysis entry point
+│   ├── llm_interpret_population.py  # Population LLM interpretation (standalone)
+│   ├── methods/                     # Attribution method implementations
+│   ├── adapters/                    # Model adapters
+│   ├── load_model/                  # Checkpoint loaders
+│   ├── spectral_attribution.py      # Patch–band correlation analysis
+│   ├── spectral_band_attribution.py # Spectral band attribution
+│   ├── faithfulness.py              # AOPC faithfulness evaluation
+│   └── visualizer.py                # Visualization utilities
 └── requirements.txt
 ```
 
 ---
 
-## 安装
+## Installation
 
 ```bash
-# 1. 普通依赖
+# 1. Standard dependencies
 pip install -r requirements.txt
 
-# 2. torch（按你的 CUDA 版本，从 pytorch.org 选命令）
+# 2. PyTorch — select the command matching your CUDA version at pytorch.org
 pip install torch --index-url https://download.pytorch.org/whl/cu121
 
-# 3. 仅运行 EEGMamba 时需要（需 GPU + CUDA + 编译器）
+# 3. EEGMamba only — requires GPU + CUDA toolkit + compiler (difficult on Windows)
 pip install packaging ninja
 pip install causal-conv1d>=1.4.0
 pip install mamba-ssm>=2.0 --no-build-isolation
@@ -59,11 +59,11 @@ pip install mamba-ssm>=2.0 --no-build-isolation
 
 ---
 
-## 快速开始
+## Quick Start
 
-### 1. 单样本分析
+### 1. Single-sample Analysis
 
-**方式 A：从数据集取样本**
+**Option A: Load from dataset**
 ```bash
 python explainability/run_explainability.py \
     --model-type cbramod \
@@ -72,12 +72,12 @@ python explainability/run_explainability.py \
     --data-from-dataset path/to/dataset \
     --index 0 \
     --method ig \
-    --output-dir ./results
-	--api-key your api_key \
-	--api-base 中转网站url （不设置则为官方调用）
+    --output-dir ./results \
+    --api-key your_api_key \
+    --api-base relay_url  # omit to use the official endpoint
 ```
 
-**方式 B：直接喂单个文件**（`.npy` / `.pt` / `.mat` / `.npz`）
+**Option B: Single file** (`.npy` / `.pt` / `.mat` / `.npz`)
 ```bash
 python explainability/run_explainability.py \
     --model-type cbramod \
@@ -85,20 +85,20 @@ python explainability/run_explainability.py \
     --checkpoint path/to/finetuned.pth \
     --data sample.npy \
     --method ig \
-    --output-dir ./results
-	--api-key your api_key \
-	--api-base 中转网站url （不设置则为官方调用）
+    --output-dir ./results \
+    --api-key your_api_key \
+    --api-base relay_url  # omit to use the official endpoint
 ```
 
-> `--data` 与 `--data-from-dataset` **二选一**。`.mat` / `.npz` 多键时用 `--data-key eeg` 指定键名。
+> `--data` and `--data-from-dataset` are mutually exclusive. For `.mat` / `.npz` files with multiple keys, specify the key with `--data-key eeg`.
 
-**默认产出**（在 `./results/sample/...` 下）：
-- 归因结果（`combined.npy`、`spatial_importance.npy`）
-- 通道地形图、波形归因图
-- 频段归因地形图（5 个频段）
-- LLM 解读报告（`--llm` 默认 `claude`）
+**Default outputs** (under `./results/sample/...`):
+- Attribution arrays (`combined.npy`, `spatial_importance.npy`)
+- Channel topomap and waveform attribution plots
+- Spectral band topomap (5 bands)
+- LLM interpretation report (`--llm` defaults to `claude`)
 
-### 2. 群体分析
+### 2. Population Analysis
 
 ```bash
 python explainability/run_population_analysis.py \
@@ -107,105 +107,109 @@ python explainability/run_population_analysis.py \
     --checkpoint path/to/finetuned.pth \
     --data-from-dataset path/to/dataset \
     --method ig \
-	--band-method ig \
-	--band-baseline zero \
+    --band-methods ig \
+    --band-baseline zero \
     --target-class 1 \
     --n-samples 100 \
     --output-dir ./population_results
 ```
 
-**默认产出**：
-- 群体平均通道重要度地形图
-- Patch 归因 vs 频段能量 Spearman 相关性（带 t 检验显著性）
-- 频段归因（每个频段的群体平均）
-- 忠实度评估（AOPC 曲线）
-- 群体级 JSON 汇总
+**Default outputs**:
+- Population-average channel importance topomap
+- Patch attribution vs. band energy Spearman correlation (with t-test significance)
+- Band attribution (population average per band)
+- Faithfulness evaluation (AOPC curve)
+- Population-level JSON summary
 
-### 3. 群体 LLM 解读（独立运行）
+### 3. Population LLM Interpretation (standalone)
 
-群体分析结束后，单独跑 LLM 生成报告：
+Run separately after population analysis:
 
 ```bash
 python -m explainability.llm_interpret_population \
     --population-dir ./population_results \
-    --llm claude （or deepseek or openai）
-	--api-key your api_key \
-	--api-base 中转网站url （不设置则为官方调用）
+    --llm claude \
+    --api-key your_api_key \
+    --api-base relay_url  # omit to use the official endpoint
 ```
 
 ---
 
-## 关键 CLI 参数
+## Key CLI Arguments
 
 ### `run_explainability.py`
 
-| 参数 | 默认 | 说明 |
+| Argument | Default | Description |
 |---|---|---|
-| `--model-type` | 必填 | `cbramod` / `labram` / `eegmamba` / `eegpt` / `biot` |
-| `--task` | 必填 | `tuab` / `bciciv2a` / `stress` / ... |
-| `--checkpoint` | 必填 | 微调后的模型权重 |
-| `--method` | 必填 | `gradcam` / `ig` / `gradient_shap` / `shap` / `lime` / `occlusion` |
-| `--data-from-dataset` | 必填 | 数据集路径（LMDB / .npy / .npz / .pt） |
-| `--index` | 0 | 样本索引 |
-| `--tp-class` | None | 自动找 true-positive 样本（替代 `--index`） |
-| `--llm` | `claude` | LLM 后端（设 `--llm none` 禁用） |
-| `--spectral-top-k` | 5 | 频段分析的 Top-K 通道数 |
-| `--patch-band-corr` | off | 单样本 Patch-频段相关性分析 |
-| `--no-band-topomap` | — | 禁用单样本频段地形图 |
+| `--model-type` | required | `cbramod` / `labram` / `eegmamba` / `eegpt` / `biot` |
+| `--task` | required | `tuab` / `bciciv2a` / `stress` / ... |
+| `--checkpoint` | required | Path to fine-tuned model weights |
+| `--method` | required | `gradcam` / `ig` / `gradient_shap` / `shap` / `lime` / `occlusion` |
+| `--data-from-dataset` | — | Dataset path (LMDB / .npy / .npz / .pt) |
+| `--data` | — | Single sample file (.npy / .pt / .mat / .npz) |
+| `--index` | 0 | Sample index when using `--data-from-dataset` |
+| `--tp-class` | None | Auto-find a true-positive sample (replaces `--index`) |
+| `--llm` | `claude` | LLM backend (`--llm none` to disable) |
+| `--spectral-top-k` | 5 | Top-K channels for band / patch-band analysis |
+| `--patch-band-corr` | off | Run single-sample patch–band correlation |
+| `--no-band-topomap` | — | Disable single-sample band topomap |
 
 ### `run_population_analysis.py`
 
-| 参数 | 默认 | 说明 |
+| Argument | Default | Description |
 |---|---|---|
-| `--target-class` | None | 单类分析（必填，或用 `--target-classes 0,1`） |
-| `--tp-conf-threshold` | 0.7 | TP 样本置信度阈值 |
-| `--fp-conf-threshold` | 0.8 | FP 样本置信度阈值 |
-| `--n-samples` | -1 | 每类筛多少样本（-1 = 全部） |
-| `--top-k` | 5 | Top-K 通道精细分析 |
-| `--skip-band-attribution` | off | 跳过频段归因（耗时） |
-| `--per-subject` | off | 按被试拆分分析 |
-| `--n-workers` | 1 | 并行进程数 |
+| `--target-class` | required | Target class index (or use `--target-classes 0,1`) |
+| `--tp-conf-threshold` | 0.7 | Confidence threshold for TP samples |
+| `--fp-conf-threshold` | 0.8 | Confidence threshold for FP samples |
+| `--n-samples` | -1 | Samples per class (-1 = all) |
+| `--top-k` | 5 | Top-K channels for detailed analysis |
+| `--band-methods` | None | Attribution method(s) for band analysis |
+| `--band-baseline` | `auto` | Baseline strategy for band attribution (`zero` / `auto` / `class_permute`) |
+| `--skip-band-attribution` | off | Skip band attribution (saves time) |
+| `--per-subject` | off | Run per-subject breakdown |
+| `--n-workers` | 1 | Number of parallel workers |
 
 ---
 
-## 支持的归因方法
+## Supported Attribution Methods
 
-| 方法 | flag 名 | Paradigm |
+| Method | Flag | Paradigm |
 |---|---|---|
-| GradCAM | `gradcam` |  Activation |
+| GradCAM | `gradcam` | Activation-based |
 | Integrated Gradients | `ig` | Gradient-based |
 | Gradient SHAP | `gradient_shap` | Gradient-based |
 | SHAP | `shap` | Perturbation-based |
 | LIME | `lime` | Perturbation-based |
 | Occlusion | `occlusion` | Perturbation-based |
 
-跑多个方法：`--methods gradcam,ig,shap` 或 `--all-methods`。
+Run multiple methods: `--methods gradcam,ig,shap` or `--all-methods`.
 
 ---
 
-## 配置文件
+## Configuration Files
 
-每个模型对应一个 YAML（`configs/<model>.yaml`），按 task 给出 `n_channels`、`n_patches`、`num_classes`、`patch_size`、`fs` 等。新增 task 时直接在对应 YAML 的 `CONFIGS:` 下加节即可。
-
----
-
-## 注意事项
-
-- 单样本路径默认会自动调用 `llm_interpret.py`；群体路径**不会**自动调用 LLM，需手动跑 `llm_interpret_population`
-- mamba-ssm 在 Windows 难装，Linux + CUDA 环境最稳
+Each model has a YAML file (`configs/<model>.yaml`) with per-task settings: `n_channels`, `n_patches`, `num_classes`, `patch_size`, `fs`, etc. To add a new task, add an entry under `CONFIGS:` in the corresponding YAML.
 
 ---
 
-## 扩展：加新模型 / 新方法
+## Notes
 
-### 加一个新模型（示例：`myeeg`）
+- Single-sample analysis calls `llm_interpret.py` automatically (when `--llm` is set). Population analysis does **not** auto-call LLM — run `llm_interpret_population` manually.
+- `mamba-ssm` is difficult to install on Windows; a Linux + CUDA environment is recommended.
+- Do not commit large data files or model weights to git. Keep them in `data/` and `pretrained-models/` (both in `.gitignore`).
 
-需要 5 个动作，全部走注册器模式：
+---
 
-1. **模型定义** — `model_list/myeeg.py`
-   定义 `MyEEGClassifier`（`forward` 接受 `(B, C, T)` 或 `(B, C, N, patch_size)`，输出 logits）。
+## Extension: Adding New Models / Methods
 
-2. **配置文件** — `configs/myeeg.yaml`
+### Adding a new model (example: `myeeg`)
+
+Five steps, all using the registry pattern:
+
+1. **Model definition** — `model_list/myeeg.py`
+   Define `MyEEGClassifier` (`forward` takes `(B, C, T)` or `(B, C, N, patch_size)`, returns logits).
+
+2. **Config file** — `configs/myeeg.yaml`
    ```yaml
    CONFIGS:
      tuab:
@@ -216,23 +220,23 @@ python -m explainability.llm_interpret_population \
        fs: 200
    ```
 
-3. **权重加载** — `explainability/load_model/load_finetune_myeeg.py`
-   写一个 `MyEEGLoader.load(checkpoint_path, ...)`，返回加载好权重的模型实例。
+3. **Checkpoint loader** — `explainability/load_model/load_finetune_myeeg.py`
+   Implement `MyEEGLoader.load(checkpoint_path, ...)` returning a model with loaded weights.
 
-4. **适配器** — `explainability/adapters/myeeg_adapter.py`
+4. **Adapter** — `explainability/adapters/myeeg_adapter.py`
    ```python
    from ..model_adapter import ModelAdapter, ModelAdapterRegistry
 
    @ModelAdapterRegistry.register('myeeg')
    class MyEEGAdapter(ModelAdapter):
-       def get_target_layer(self): ...    # GradCAM 用
+       def get_target_layer(self): ...    # required for GradCAM
        def get_n_channels(self): ...
        def get_n_patches(self): ...
-       def prepare_input(self, x): ...    # 训练时若做了归一化，这里要复现
+       def prepare_input(self, x): ...    # reproduce any training-time normalization
    ```
-   然后在 `explainability/adapters/__init__.py` 加 `from .myeeg_adapter import MyEEGAdapter`。
+   Then add `from .myeeg_adapter import MyEEGAdapter` to `explainability/adapters/__init__.py`.
 
-5. **模型工厂** — 在 `explainability/run_explainability.py` 注册创建函数：
+5. **Model factory** — register in `explainability/run_explainability.py`:
    ```python
    @ModelFactory.register('myeeg')
    def create_myeeg_model(config, checkpoint_path=None, **kwargs):
@@ -240,25 +244,25 @@ python -m explainability.llm_interpret_population \
        return MyEEGLoader.load(checkpoint_path=checkpoint_path, **config)
    ```
 
-跑：`python explainability/run_explainability.py --model-type myeeg ...`
+Usage: `python explainability/run_explainability.py --model-type myeeg ...`
 
-### 加一个新归因方法（示例：`mygrad`）
+### Adding a new attribution method (example: `mygrad`)
 
-1. **方法实现** — `explainability/methods/mygrad.py`
+1. **Method implementation** — `explainability/methods/mygrad.py`
    ```python
    from ..base import ExplainabilityMethod, ExplainabilityRegistry
 
    @ExplainabilityRegistry.register('mygrad')
    class MyGrad(ExplainabilityMethod):
        def explain(self, input_tensor, target=None):
-           # 计算归因，返回 (B, C, T) 或 (B, C, N) 的 numpy
+           # compute attribution, return numpy array (B, C, T) or (B, C, N)
            ...
            return attribution
    ```
 
-2. 在 `explainability/methods/__init__.py` 加 `from .mygrad import MyGrad`。
+2. Add `from .mygrad import MyGrad` to `explainability/methods/__init__.py`.
 
-跑：`python explainability/run_explainability.py --method mygrad ...`
+Usage: `python explainability/run_explainability.py --method mygrad ...`
 
 ---
 
